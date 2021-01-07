@@ -1,0 +1,15 @@
+windows 下查看偏向锁信息：java -XX:+PrintFlagsFinal -version | findstr BiasedLocking
+linux 下查看偏向锁信息：java -XX:+PrintFlagsFinal -version | grep BiasedLocking
+
+取消偏向延迟：-XX:BiasedLockingStartupDelay=0
+
+偏向锁撤销 = 对象不再支持偏向了，下次有线程来的话直接是轻量级锁了。
+撤销的方法：
+ 1、hashcode()
+ 2、其他线程给该对象加锁(不能再同一时刻),该对象的偏向锁也会撤销，变成轻量级锁
+ 3、使用wait\notify ，以为使用这两个方法必须同一时刻多个线程同时持有同一个锁。
+
+
+
+ 批量重偏向
+ 批量撤销（jvm认为该对象不适合偏向，变成轻量级锁）
