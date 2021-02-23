@@ -43,8 +43,9 @@ class ThreadPool{
 
     public void execute(Runnable r){
         synchronized (workers){
-            //如果线程池里面的线程数小于则创建，等于或者大于则不进行创建,放到等待队列中
+            //如果线程池里面的线程数小于则创建，等于或者大于则不进行创建,放到等待队列中-------------
             if(workers.size()<coreSize){
+                // 工作线程创建start后则开始执行，因为run里面有while(true)，肯定会一直执行的
                 Worker worker = new Worker(r);
                 System.out.println("新增worker。。"+worker);
                 workers.add(worker);
@@ -81,6 +82,7 @@ class ThreadPool{
             while (task !=null || (task=taskQueue.take())!=null){
                 try {
                     System.out.println("正在执行。。。"+task.hashCode());
+                    //最终执行传入任务的 run 方法
                     task.run();
                 }catch (Exception e){
                     e.printStackTrace();

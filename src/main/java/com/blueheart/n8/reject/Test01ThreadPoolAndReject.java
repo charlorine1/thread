@@ -29,7 +29,7 @@ public class Test01ThreadPoolAndReject {
         ThreadPool pool = new ThreadPool(2, 3000, TimeUnit.MILLISECONDS, 2
         ,(queue,task) ->{
             //死等,如果阻塞丢列不释放，一直等着
-           // queue.put(task);
+            queue.put(task);
             //带超时等待  (未解决)
            // queue.offer(task);
             //System.out.println("queue 已经满了，task不做处理(不会加到queue里面)，直接丢弃");
@@ -37,7 +37,7 @@ public class Test01ThreadPoolAndReject {
             //抛出异常
             //throw new RuntimeException("任务执行失败 " + task);
             //调用者自己执行
-            task.run();
+          //  task.run();
         });
         //主线程提交任务,
        for (int i = 0; i < 5; i++) {
@@ -82,35 +82,6 @@ interface RejectPolicy<T>{
  void reject(BlockingQueue<T> queue,T task);
 }
 
-class  Task implements Runnable{
-    private Socket socket;
-
-    public Task(Socket socket) {
-        this.socket = socket;
-    }
-
-    @Override
-    public void run() {
-        InputStream in = null;
-        try {
-            in = socket.getInputStream();
-            byte [] bytes = new byte[1024];
-            int i=0;
-            while ((i=in.read(bytes)) != -1){
-                System.out.println("socket 接收到数据:" + new String(bytes,0,i,CharsetUtil.UTF_8));
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            try {
-                in.close();
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-}
 
 //自定义线程池
 class ThreadPool{

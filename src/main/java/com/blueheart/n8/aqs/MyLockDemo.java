@@ -15,7 +15,7 @@ import java.util.concurrent.locks.Lock;
  * 2、setExclusiveOwnerThread  当前线程的拥有者
  *
  *
- * 加锁和解锁都是在这两个方法上面做操作的
+ * 加锁和解锁都是在这两个方法上面做操作的，要重写abstractQueuedSynchroniezer 的tryAccquire 和trytrelease
  * 加锁： tryAcquire(int arg)     其中包括，一直等待获取锁、尝试一次、在一段时间内重复尝试    //比如这个方法都已经被AQS 封装好了，只要实现里面的tryAquire方法就好了
  * 解锁：tryRelease(int releases)
  *
@@ -58,6 +58,14 @@ public class MyLockDemo {
 
 }
 
+
+/**
+ * 20210129
+ * 上锁、解锁是锁MyLock的功能
+ * 获取state、存入队列由继承了abstractQueuedSychroniezer的内部类来维护
+ *
+ *
+ */
 //实现一个自定的锁
 class  MyLock implements Lock{
     MySyn syn = new MySyn();
@@ -65,7 +73,8 @@ class  MyLock implements Lock{
     //加锁， 尝试，不成功，进入等待队列
     @Override
     public void lock() {
-           // syn.tryAcquire(1);     //执行一次获取锁操作,失败就不在进行获取操作  ，实现肯定比acquire简单，acquire还要进入到队列中
+           // syn.tryAcquire(1);     //执行一次获取锁操作,失败就不在进行获取操作，没有while(true) ，因为tryRelease  不涉及到阻塞的队列，加锁肯定要设计到阻塞队列，加锁失败的话要进入队列中等待，
+         // 到时候进行再次获取(不同的方法处理不同，tryLock() 就只尝试一次，所以可以直接调用syn.tryAcquire(1); )
         syn.acquire(1);   // 获取锁 失败则会进入等待队列 ，里面还是tryAcquire()
     }
 
@@ -88,11 +97,10 @@ class  MyLock implements Lock{
         return syn.tryAcquireNanos(1,unit.toNanos(time));    //比如这个方法都已经被AQS 封装好了，只要实现里面的tryAquire方法就好了
     }
 
-
-    //释放锁
+    //释放锁 ,然后把状态和拥有者改变，不会有唤醒等待线程的步骤，因为加锁是在加锁线程一直轮询的( for (;;)) ,除了tryLock以为，tryLock()只是尝试一次加锁请求
     @Override
     public void unlock() {
-      //  syn.tryRelease(1);   //锁释放不了
+      //  syn.tryRelease(1);   //锁释放不了 ，因为tryRelease  不涉及到阻塞的队列
         syn.release(1);
     }
 
@@ -103,9 +111,14 @@ class  MyLock implements Lock{
         return null;
     }
 
+    /***
+     *  MyLock（lock()） --->      Sycn(lock()多次尝试，lockInterruptibly() 尝试可打断,tryLock( timeout)，这些方法做一些操作后)     --- >AbstractQueuedSycnhronizer （tryAcquire()）
+     *  MyLock (Unlock())  --->   Sycn(lUnock()   -->AbstractQueuedSycnhronizer  (tryRelease())
+     *
+     */
     class MySyn extends AbstractQueuedSynchronizer{
 
-        //试图获取锁 传入的是1->加锁， 0->解锁
+        //实质做获取锁操作(进行状态和设置拥有者属性) 传入的是1->去加锁， 要么成功，要么失败，该方法没有没有循环操作, 不涉及到阻塞队列
         @Override
         protected boolean tryAcquire(int arg) {
                 //1、判断状态
@@ -119,7 +132,7 @@ class  MyLock implements Lock{
             //2、已加锁判断是否是自己(锁重入)
         }
 
-        //产生解锁   0->解锁
+        //实质性做释放锁操作(进行状态的修改和拥有者的释放)  0->解锁，要么释放成功，要么释放失败，没有循环操作，不涉及到阻塞队列
         @Override
         protected boolean  tryRelease(int acquires) {
           /*  int state = getState();
@@ -157,7 +170,7 @@ class  MyLock implements Lock{
         }
 
 
-        //  ???
+        //  Mutex：不可重入互斥锁，锁资源（state）只有两种状态：0：未被锁定；1：锁定。
         @Override
         protected boolean isHeldExclusively() {
             return getState() == 1;

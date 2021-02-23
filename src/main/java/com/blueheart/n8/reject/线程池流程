@@ -1,0 +1,8 @@
+pool.execute(r)  --> 调用线程池的启动方法
+                            1、线程池的线程数不大于核心线程是时候:把任务通过构造方法把任务  r 传入 线程池中的工作线程中,然后work.start()    ,实质Worker工作线程
+                                    执行的是r的代码,     task.run();
+
+                            2、线程池的线程数大于核心线程数，则把拒绝策略和queue 调用    taskQueue.tryPut(rejectPolicy,r);   传到任务放到工作队列中
+
+                            3、步骤1执行完成了会通过while()循环查询queue队列是否还有需要执行的任务，如果有则取出执行，判断依据
+                                while (task !=null || (task=taskQueue.take())!=null){
