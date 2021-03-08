@@ -124,7 +124,7 @@ class  MyLock implements Lock{
                 //1、判断状态
             int state = getState();
             if(state==0){
-               compareAndSetState(0,arg);    //要0 才能更新，因为在前面获取的同时可能马上就被其他线程修该了
+               compareAndSetState(0,arg);    //要0 才能更新，因为在前面获取的同时可能马上就被其他线程修该了,所以要使用CAS
                 setExclusiveOwnerThread(Thread.currentThread());
                 return true;
             }

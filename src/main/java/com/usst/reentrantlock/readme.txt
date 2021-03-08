@@ -15,5 +15,5 @@ reentranLock的功能和synchronized类似
 1、可中断
 2、可以设置超时时间，就是该锁等待一段时间后如果超时则不会去等待锁了。会去做些其他的事情
 3、可以设置为公平锁
-4、支持多个条件变量(相当于synchronized 里面waitSet，reentranLock里面有多个waitset()，如果条件满足则唤醒该set里面的值，不会想
-     synchronized一样条件满足把全部waitSet唤醒)
+4、支持多个条件变量(相当于synchronized 里面waitSet，reentranLock里面有多个waitset()，如果条件满足则唤醒该set里面的值，不会像
+     synchronized一样条件满足把全部waitSet唤醒或者唤醒其中的一个)
