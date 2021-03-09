@@ -4,6 +4,8 @@ package com.blueheart.n8.interrupted;
 /**
  *      interrupt()   打断线程
          如果被打断线程正在 sleep，wait，join 会导致被打断的线程抛出 InterruptedException，所以在sleep的时候要是有try  catch来进行捕捉异常，并清除打断标记 ；
+                         if (Thread.interrupted())
+                         throw new InterruptedException();
          如果打断的正在运行的线程，则会设置 打断标记 ；park 的线程被打断，也会设置 打断标记
         打断标记可以用来判断线程是否被打断,有打断标记的话，interrupted() 返回的就是true，打断标记被清除的话，interrupted() 返回的就是false
 

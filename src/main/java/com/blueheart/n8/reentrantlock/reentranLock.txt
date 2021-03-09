@@ -1,0 +1,20 @@
+线程执行加锁方法，t1.lock()，--》会把使用park方法，此时自己就park住,且加到队列里面，如果是第一个就加到head.next，唤醒由其他队列的其他线程唤醒
+    private final boolean parkAndCheckInterrupt() {
+        LockSupport.park(this);
+        return Thread.interrupted();
+    }
+
+
+
+线程t1.unlokc(),会去把头结点的next唤醒，调用unpark方法（下面的16行），此时该线程接这之前park住的地方往下执行，又继续调用tryaquire方法，但是此时新来的线程也会竞争这个status
+到底谁能获取到就不一定了，如果该节点没获取到，又会进入park
+                    p.next = null; // help GC
+                    failed = false;
+                    return interrupted;
+                }
+                if (shouldParkAfterFailedAcquire(p, node) &&
+                    parkAndCheckInterrupt())
+                    interrupted = true;
+
+
+非公平是队列里面的和新来的同时竞争还是只是头结点和新来的竞争？？？？

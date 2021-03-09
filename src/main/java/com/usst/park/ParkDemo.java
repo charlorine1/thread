@@ -21,7 +21,8 @@ public class ParkDemo {
         System.out.println("unpark...");
         LockSupport.unpark(t1);   //唤醒上面的t1线程
 
-
+        t1.interrupt();
+        Thread.interrupted();
 
 
     }
