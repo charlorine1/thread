@@ -5,7 +5,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
- *可重入是指一个线程获取了某一把锁，那么他就是改把锁的拥有者，因此有权再次获得改把锁
+ *可重入是指一个线程获取了某一把锁，那么他就是该把锁的拥有者，因此有权再次获得改把锁
  * 不可重入是指第二次去获取改把锁的时候，会被获取失败，被锁挡住
  */
 public class CanChongRu {

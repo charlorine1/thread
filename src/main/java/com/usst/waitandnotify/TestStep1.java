@@ -3,7 +3,7 @@ package com.usst.waitandnotify;
 
 /**
  * sleep和wait最大的区别就是
- * 1、sleep()不会释放对象锁，wait会进入到等待队列waitset()此时会释放对象锁
+ * 1、sleep()不会释放对象锁，wait会释放锁对象  进入到等待队列waitset()此时会释放对象锁
  * 2、notify()会随机唤醒waitSet里面的一个线程，如果唤醒的是没被期待的那个线程，就叫做虚假唤醒，则使用notifyAll()
  *
  */
